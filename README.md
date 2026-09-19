@@ -1,4 +1,4 @@
-# LinguaGraph M7 external proof / successor rebind preparation
+# LinguaGraph M7 external proof / successor provider rebind
 
 This independent repository contains proof infrastructure only for
 **M7 — Alignment Mutation Concurrency Hardening**. It does not modify the
@@ -10,11 +10,12 @@ historical `Pacchifans69/linguagraph-m6-proof` evidence repository.
 ```text
 checkpoint:             M7
 proof path:             M7-EXI-01 — alternate hosted Gate 2 proof framework
-stage:                  successor Product rebind preparation
+stage:                  successor provider rebind; final static re-audit pending
 successor proof:        NOT AUTHORIZED / NOT EXECUTED
 successor run auth:     NOT ISSUED
 successor Gate 2:       NOT ESTABLISHED
-provider binding:       PENDING / old exact ECS was released
+provider preflight:     P3A / P3B / P3C PASS
+provider binding:       fresh exact ECS / source-bound
 prior 854137cd epoch:   Gate 2 PASS / ESTABLISHED (historical exact-epoch evidence)
 ```
 
@@ -31,10 +32,11 @@ classification:    provider / pre-step failure
 semantic evidence: none
 ```
 
-This diagnostic is not application/test evidence. Any alternate hosted proof
-for the successor still requires a fresh Human-reviewed proof source, a fresh
-one-shot authorization, and an exact provider binding. No successor execution
-is authorized by this preparation.
+This diagnostic is not application/test evidence. The successor proof source is
+already bound to the exact Product candidate and, by this provider rebind, to a
+fresh exact ECS identity. It still requires an independent exact static
+re-audit and a fresh one-shot Human authorization before formal execution. No
+successor execution is authorized by this rebind.
 
 ## Exact Product binding
 
@@ -201,29 +203,45 @@ test skipped or filtered.
 
 ## Provider boundary
 
-The Alibaba adapter still contains the exact identity of the host used by the
-prior `854137cd...` proof:
+A separately Human-authorized fresh-provider establishment completed P3A, P3B,
+and P3C before this source rebind. The Alibaba adapter is bound to this exact
+fresh execution identity:
 
 ```text
-instance id:   i-j6c13vpnkuq6xbbhyxzw
+instance id:   i-j6c6wx48n07xnkpoxsjc
 region:        cn-hongkong
 zone:          cn-hongkong-d
 instance type: ecs.g9i.xlarge
 image:         ubuntu_24_04_x64_20G_alibase_20260828.vhd
 ```
 
-That exact ECS and its exact system disk were released after the predecessor
-proof artifacts were retrieved and independently verified off-host. The
-adapter's old provider constants are therefore **historical fail-closed guards,
-not a reusable provider binding**.
+P3B control-plane observations were:
 
-This successor Product rebind deliberately does not invent a replacement
-provider identity and does not weaken the adapter to accept arbitrary hosts.
-Before any successor execution can be considered, a separate Human-authorized
-provider stage must establish a new exact instance/region/zone/type/image tuple
-and a later bounded provider-rebind correction must replace the historical
-constants. Until then the Alibaba adapter is **NOT EXECUTABLE FOR THE
-SUCCESSOR**.
+```text
+system disk:   d-j6c6wx48n07xnkpm461g
+disk shape:    cloud_essd / 40 GiB / DeleteWithInstance=true
+VPC:           vpc-j6cgz9a4frhl3oxxbecsj
+vSwitch:       vsw-j6c9f1ch565yr60wzx2rc
+private IPv4:  172.23.68.215
+EIP:           47.238.211.55
+```
+
+P3C independently established Ubuntu 24.04 / x86_64, 4 CPUs, sufficient RAM,
+root account home `/root`, clean M7 host state, required outbound access,
+unchanged proof/Product refs, tokenless IMDS rejection with HTTP 403, successful
+IMDS token mode, exact instance/region/zone/type/image/VPC/vSwitch/private-IP
+identity, and non-empty signed instance identity document / PKCS7 material.
+Docker was intentionally left uninstalled; the reviewed adapter may bootstrap
+`docker.io` during a later separately authorized formal run.
+
+The adapter's executable immutable provider guard remains deliberately narrow:
+exact instance ID, region, zone, instance type, and image. Disk/network values
+above are retained preflight observations, not newly introduced execution
+guards. In particular, runtime-assigned IP addresses are not treated as
+immutable provider identity.
+
+The predecessor host `i-j6c13vpnkuq6xbbhyxzw` remains historical only and is
+not accepted by this rebound adapter.
 
 ## One-shot authorization
 
@@ -254,7 +272,7 @@ Canonical archive and SHA-256 sidecar paths are reserved with no-clobber
 semantics. A replay or any pre-existing archive slot therefore fails closed
 without overwriting the first retained artifact.
 
-## Successor rebind preparation boundary
+## Successor provider-rebind boundary
 
 This preparation commit authorizes and performs **none** of the following:
 
@@ -270,11 +288,12 @@ NO PR
 NO merge
 ```
 
-This rebind changes only the Product identity carried by the provider-neutral
-core plus proof-source documentation/comments. It does not change semantic
-proof stages, suite-count guards, one-shot/replay protection, artifact
-packaging, runtime pins, or provider identity checks.
+This provider rebind changes only this README plus Alibaba-adapter
+documentation/comments and the exact expected instance ID. The provider-neutral
+core remains byte-identical; Product pins, semantic proof stages, suite-count
+guards, runtime pins, one-shot/replay protection, and artifact packaging are
+unchanged. Region, zone, instance type, and image guards are unchanged.
 
 The next step after landing, if separately authorized, is an independent exact
-proof-source static re-audit. Provider provisioning/rebinding and formal hosted
-execution remain separate Human authorization boundaries.
+proof-source static re-audit of the resulting new proof SHA. Only after that
+audit passes may a fresh one-shot formal run authorization be considered.

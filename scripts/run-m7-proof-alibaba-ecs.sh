@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # M7-EXI-01 Alibaba ECS thin adapter.
 #
-# Successor Product rebind preparation only. Hosted execution is NOT authorized.
-# The provider identity constants below belong to the prior proof host, which
-# has been released. A formal successor run requires a separately authorized
-# exact provider rebind, exact proof SHA approval, and fresh one-shot authorization.
+# Successor provider rebind. Hosted execution remains NOT authorized by this
+# commit. The exact provider identity below was established by the separately
+# authorized P3A/P3B/P3C preflight. A formal successor run still requires an
+# independent exact static re-audit, Human approval of the resulting proof SHA,
+# and a fresh one-shot authorization.
 set -Eeuo pipefail
 
 readonly PROOF_ROOT="$(git rev-parse --show-toplevel)"
@@ -35,13 +36,10 @@ readonly IMDS_BASE='http://100.100.100.200/latest'
 readonly IMDS_TOKEN_URL="$IMDS_BASE/api/token"
 readonly IMDS_TTL='21600'
 
-# Historical exact provider binding from the predecessor 854137cd... proof.
-# That instance and its system disk were released after off-host artifact
-# verification. These values are intentionally retained as fail-closed legacy
-# guards during successor Product rebind preparation; they MUST be replaced by
-# a separately Human-authorized exact provider rebind before successor execution.
-# Do not weaken this guard into a wildcard or runtime-supplied arbitrary host.
-readonly EXPECTED_INSTANCE_ID='i-j6c13vpnkuq6xbbhyxzw'
+# Exact fresh provider binding established by the separately authorized M7
+# successor P3A/P3B/P3C provider preflight. Keep this fail-closed: do not replace
+# these constants with wildcards or runtime-supplied arbitrary host identity.
+readonly EXPECTED_INSTANCE_ID='i-j6c6wx48n07xnkpoxsjc'
 readonly EXPECTED_REGION_ID='cn-hongkong'
 readonly EXPECTED_ZONE_ID='cn-hongkong-d'
 readonly EXPECTED_INSTANCE_TYPE='ecs.g9i.xlarge'
