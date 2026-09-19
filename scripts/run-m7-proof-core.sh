@@ -262,7 +262,11 @@ required = {
 missing = sorted(required - names)
 if missing:
     raise SystemExit("missing required M7 concurrency tests in JUnit: " + ", ".join(missing))
-if any(root.iter("failure")) or any(root.iter("error")) or any(root.iter("skipped")):
+if (
+    next(root.iter("failure"), None) is not None
+    or next(root.iter("error"), None) is not None
+    or next(root.iter("skipped"), None) is not None
+):
     raise SystemExit("JUnit contains failure/error/skipped nodes")
 print("M7 required concurrency tests present:", len(required))
 for name in sorted(required):

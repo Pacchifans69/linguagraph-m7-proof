@@ -16,7 +16,9 @@ export M7_PROOF_EVIDENCE_DIR="$EVIDENCE"
 
 readonly PROOF_ORIGIN_URL='https://github.com/Pacchifans69/linguagraph-m7-proof.git'
 
-readonly HOST_STATE="${M7_PROOF_HOST_STATE:-$HOME/.local/state/linguagraph-m7-proof}"
+readonly INHERITED_HOST_STATE="${M7_PROOF_HOST_STATE:-}"
+readonly FIXED_HOST_STATE="$HOME/.local/state/linguagraph-m7-proof"
+readonly HOST_STATE="$FIXED_HOST_STATE"
 readonly SPENT_DIR="$HOST_STATE/spent"
 readonly ARCHIVE_DIR="$HOST_STATE/artifacts"
 
@@ -36,6 +38,7 @@ readonly EXPECTED_IMAGE_ID='ubuntu_24_04_x64_20G_alibase_20260828.vhd'
 readonly RUN_AUTH_NAMESPACE_DESCRIPTION='M7-EXI-01-RUN-<approved-proof-sha-prefix>-<nonce>'
 
 IMDS_TOKEN=''
+AUTHORIZATION_SHA256=''
 core_rc=0
 
 die() { printf 'FAIL: %s\n' "$*" >&2; exit 1; }
@@ -87,7 +90,7 @@ finalize() {
 
   mkdir -p "$ARCHIVE_DIR" 2>/dev/null || packaging_failed=1
   if [[ -d "$ARCHIVE_DIR" ]]; then
-    archive_name="m7-proof-artifacts-${APPROVED_PROOF_SHA:-unknown}.tar.gz"
+    archive_name="m7-proof-artifacts-${APPROVED_PROOF_SHA:-unknown}-${AUTHORIZATION_SHA256:-no-authorization}.tar.gz"
     archive="$ARCHIVE_DIR/$archive_name"
     build_archive "$archive_name" "$archive" || packaging_failed=1
   fi
@@ -103,7 +106,6 @@ finalize() {
 
   exit "$exit_code"
 }
-trap finalize EXIT
 
 guard_no_circleci() {
   local v
@@ -116,6 +118,17 @@ guard_evidence_path() {
   if [[ -n "$INHERITED_EVIDENCE_DIR" && "$INHERITED_EVIDENCE_DIR" != "$FIXED_EVIDENCE" ]]; then
     die "M7_PROOF_EVIDENCE_DIR must be unset or exactly $FIXED_EVIDENCE; refusing redirected evidence"
   fi
+}
+
+guard_host_state_path() {
+  if [[ -n "$INHERITED_HOST_STATE" && "$INHERITED_HOST_STATE" != "$FIXED_HOST_STATE" ]]; then
+    die "M7_PROOF_HOST_STATE must be unset or exactly $FIXED_HOST_STATE; refusing redirected spent-token authority"
+  fi
+}
+
+guard_clean_start() {
+  [[ ! -e "$EVIDENCE" ]] || die "Pre-existing proof evidence path exists: $EVIDENCE"
+  [[ ! -e "$PROOF_ROOT/candidate" ]] || die "Pre-existing candidate checkout path exists: $PROOF_ROOT/candidate"
 }
 
 guard_proof_sha() {
@@ -139,8 +152,9 @@ guard_run_authorization() {
   fi
 
   local lower_prefix="${prefix,,}" token_hash
-  expect "${APPROVED_PROOF_SHA:0:${#lower_prefix}}" "$lower_prefix" authorization_proof_sha_prefix
   token_hash=$(printf '%s' "$token" | sha256sum | cut -d' ' -f1)
+  AUTHORIZATION_SHA256="$token_hash"
+  expect "${APPROVED_PROOF_SHA:0:${#lower_prefix}}" "$lower_prefix" authorization_proof_sha_prefix
 
   mkdir -p "$SPENT_DIR"
   if ! mkdir "$SPENT_DIR/$token_hash" 2>/dev/null; then
@@ -149,7 +163,7 @@ guard_run_authorization() {
 
   record proof_provider alibaba-ecs
   record authorization_namespace M7-EXI-01
-  record authorization_sha256 "$token_hash"
+  record authorization_sha256 "$AUTHORIZATION_SHA256"
   record approved_proof_sha "$APPROVED_PROOF_SHA"
   record date_utc "$(date -u +%FT%TZ)"
 }
@@ -281,17 +295,23 @@ bootstrap_host() {
   sudo -n docker info >/dev/null 2>&1 || die 'Docker did not become usable after bootstrap'
 
   {
-    printf 'docker_io_version=%s\n' "$(dpkg-query -W -f='\${Version}' docker.io 2>/dev/null || printf unavailable)"
+    printf 'docker_io_version=%s\n' "$(dpkg-query -W -f='${Version}' docker.io 2>/dev/null || printf unavailable)"
     sudo -n docker --version
   } >> "$EVIDENCE/alibaba-bootstrap.txt"
 }
 
 guard_no_circleci
 guard_evidence_path
+guard_host_state_path
 guard_proof_sha
+guard_clean_start
 case "$HOST_STATE" in
   "$PROOF_ROOT"|"$PROOF_ROOT"/*) die 'Host state directory must be outside the git worktree' ;;
 esac
+
+# Only after all clean-start guards pass do failures become formal evidence
+# lifecycle events. This prevents stale ignored evidence from being repackaged.
+trap finalize EXIT
 mkdir -p "$EVIDENCE"
 guard_run_authorization
 guard_and_capture_imds

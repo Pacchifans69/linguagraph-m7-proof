@@ -10,7 +10,7 @@ historical `Pacchifans69/linguagraph-m6-proof` evidence repository.
 ```text
 checkpoint:        M7
 exception:         M7-EXI-01 — Alibaba ECS Hosted Gate 2 Proof
-stage:             P1 — proof harness preparation
+stage:             P2 — bounded harness correction; final static re-audit pending
 proof execution:   NOT AUTHORIZED / NOT EXECUTED
 run authorization: NOT ISSUED
 Gate 2 result:     NOT ESTABLISHED
@@ -65,8 +65,8 @@ M7 deliberately uses a new namespace and independent state:
 proof repository:       Pacchifans69/linguagraph-m7-proof
 evidence env:           M7_PROOF_EVIDENCE_DIR
 run auth env:           M7_PROOF_RUN_AUTHORIZATION
-host state env:         M7_PROOF_HOST_STATE
-default host state:     ~/.local/state/linguagraph-m7-proof
+host state env:         M7_PROOF_HOST_STATE (unset or exact fixed path only)
+fixed host state:       ~/.local/state/linguagraph-m7-proof
 PostgreSQL container:   linguagraph-m7-proof-postgres
 authorization namespace:
   M7-EXI-01-RUN-<approved-proof-sha-prefix>-<nonce>
@@ -115,6 +115,9 @@ The Alibaba adapter owns:
 - signed instance identity document / PKCS7 capture;
 - exact expected instance/region/zone/type/image guard;
 - minimal Docker bootstrap when required;
+- clean-start rejection of pre-existing candidate/evidence paths;
+- fixed, non-redirectable M7 spent-token authority;
+- per-authorization proof-artifact archive identity;
 - deterministic proof-artifact archive and external SHA-256.
 
 ## Required M7 concurrency evidence
@@ -187,7 +190,18 @@ A formal invocation requires all of:
 
 Only the SHA-256 of the authorization token is retained. Reuse fails closed.
 
-## Stage P1 boundary
+Each formal authorization also receives a distinct archive identity:
+
+```text
+m7-proof-artifacts-<approved-proof-sha>-<authorization-sha256>.tar.gz
+```
+
+Before any token is consumed, the adapter rejects a pre-existing
+`proof-artifacts/` directory or `candidate/` checkout. The spent-token
+authority is fixed at `~/.local/state/linguagraph-m7-proof`; an inherited
+`M7_PROOF_HOST_STATE` may only repeat that exact path.
+
+## Stage P2 bounded correction boundary
 
 This preparation commit authorizes and performs **none** of the following:
 
@@ -203,5 +217,10 @@ NO PR
 NO merge
 ```
 
-The next stage is independent **P2 exact proof-source static audit**. Only after
-P2 acceptance may provider preflight be separately considered.
+The P2 bounded correction closes the static-audit findings concerning stale
+evidence reuse, archive collisions, redirectable spent-token state, and the
+Python ElementTree JUnit check. It does not authorize execution.
+
+The next step is an independent **P2 final exact proof-source static
+re-audit**. Only after that audit passes may provider preflight be separately
+considered.
