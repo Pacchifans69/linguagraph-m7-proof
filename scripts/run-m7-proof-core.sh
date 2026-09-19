@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # LinguaGraph M7 provider-neutral semantic proof core.
 #
-# Stage P1 preparation only. This file MUST NOT be executed without a separate
+# Stage P2 corrected harness only. This file MUST NOT be executed without a separate
 # Human approval of the exact proof commit and a fresh M7-EXI-01 one-shot run
 # authorization supplied through the Alibaba ECS adapter.
 set -Eeuo pipefail

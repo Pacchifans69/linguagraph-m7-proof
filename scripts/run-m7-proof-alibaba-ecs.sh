@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # M7-EXI-01 Alibaba ECS thin adapter.
 #
-# Stage P1 preparation only. Hosted execution is NOT authorized by this commit.
+# Stage P2 bounded harness correction only. Hosted execution is NOT authorized by this commit.
 # A formal run requires later Human approval of the exact proof SHA plus a
 # fresh one-shot M7-EXI-01 run authorization.
 set -Eeuo pipefail
@@ -16,8 +16,16 @@ export M7_PROOF_EVIDENCE_DIR="$EVIDENCE"
 
 readonly PROOF_ORIGIN_URL='https://github.com/Pacchifans69/linguagraph-m7-proof.git'
 
+readonly INHERITED_HOME="${HOME:-}"
+ACCOUNT_HOME=''
+if ! ACCOUNT_HOME="$(getent passwd "$(id -u)" | awk -F: 'NR == 1 { print $6 }')"; then
+  printf 'FAIL: unable to resolve account home from passwd database\n' >&2
+  exit 1
+fi
+[[ -n "$ACCOUNT_HOME" ]] || { printf 'FAIL: resolved account home is empty\n' >&2; exit 1; }
+readonly ACCOUNT_HOME
 readonly INHERITED_HOST_STATE="${M7_PROOF_HOST_STATE:-}"
-readonly FIXED_HOST_STATE="$HOME/.local/state/linguagraph-m7-proof"
+readonly FIXED_HOST_STATE="$ACCOUNT_HOME/.local/state/linguagraph-m7-proof"
 readonly HOST_STATE="$FIXED_HOST_STATE"
 readonly SPENT_DIR="$HOST_STATE/spent"
 readonly ARCHIVE_DIR="$HOST_STATE/artifacts"
@@ -60,17 +68,30 @@ write_manifest() {
 }
 
 build_archive() {
-  local archive_name=$1 archive=$2
-  if tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner        -C "$PROOF_ROOT" -cf - proof-artifacts | gzip -n > "$archive"; then
-    (cd "$ARCHIVE_DIR" && sha256sum "$archive_name" > "$archive_name.sha256")
-  else
-    rm -f "$archive" "$ARCHIVE_DIR/$archive_name.sha256"
+  local archive_name=$1 archive=$2 sidecar="${archive}.sha256"
+
+  # Reserve both canonical output paths without clobbering. This makes a
+  # repeated authorization attempt incapable of overwriting the first archive.
+  if ! (set -o noclobber; : > "$archive") 2>/dev/null; then
+    return 2
+  fi
+  if ! (set -o noclobber; : > "$sidecar") 2>/dev/null; then
+    rm -f "$archive"
+    return 2
+  fi
+
+  if ! tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner        -C "$PROOF_ROOT" -cf - proof-artifacts | gzip -n > "$archive"; then
+    rm -f "$archive" "$sidecar"
+    return 1
+  fi
+  if ! (cd "$ARCHIVE_DIR" && sha256sum "$archive_name" > "$archive_name.sha256"); then
+    rm -f "$archive" "$sidecar"
     return 1
   fi
 }
 
 finalize() {
-  local exit_code=$? packaging_failed=0 archive_name='' archive='' first_line=''
+  local exit_code=$? packaging_failed=0 archive_name='' archive='' first_line='' archive_rc=0
   trap - EXIT
   mkdir -p "$EVIDENCE" 2>/dev/null || true
 
@@ -92,14 +113,20 @@ finalize() {
   if [[ -d "$ARCHIVE_DIR" ]]; then
     archive_name="m7-proof-artifacts-${APPROVED_PROOF_SHA:-unknown}-${AUTHORIZATION_SHA256:-no-authorization}.tar.gz"
     archive="$ARCHIVE_DIR/$archive_name"
-    build_archive "$archive_name" "$archive" || packaging_failed=1
+    build_archive "$archive_name" "$archive" || {
+      archive_rc=$?
+      packaging_failed=1
+      if (( archive_rc == 2 )); then
+        printf 'archive_collision=%s\n' "$archive_name" >> "$EVIDENCE/adapter-packaging.txt"
+      fi
+    }
   fi
 
   if (( packaging_failed != 0 )); then
     printf 'FAIL packaging_failed=1 adapter_exit=%s\n' "$exit_code" > "$EVIDENCE/outcome.txt"
     exit_code=1
     write_manifest || true
-    if [[ -d "$ARCHIVE_DIR" && -n "$archive_name" ]]; then
+    if [[ -d "$ARCHIVE_DIR" && -n "$archive_name" && ! -e "$archive" && ! -e "${archive}.sha256" ]]; then
       build_archive "$archive_name" "$archive" || true
     fi
   fi
@@ -121,6 +148,9 @@ guard_evidence_path() {
 }
 
 guard_host_state_path() {
+  if [[ "$INHERITED_HOME" != "$ACCOUNT_HOME" ]]; then
+    die "HOME must exactly match account home $ACCOUNT_HOME; refusing redirected spent-token authority"
+  fi
   if [[ -n "$INHERITED_HOST_STATE" && "$INHERITED_HOST_STATE" != "$FIXED_HOST_STATE" ]]; then
     die "M7_PROOF_HOST_STATE must be unset or exactly $FIXED_HOST_STATE; refusing redirected spent-token authority"
   fi

@@ -117,7 +117,7 @@ The Alibaba adapter owns:
 - minimal Docker bootstrap when required;
 - clean-start rejection of pre-existing candidate/evidence paths;
 - fixed, non-redirectable M7 spent-token authority;
-- per-authorization proof-artifact archive identity;
+- collision-rejecting per-authorization proof-artifact archive identity;
 - deterministic proof-artifact archive and external SHA-256.
 
 ## Required M7 concurrency evidence
@@ -198,8 +198,13 @@ m7-proof-artifacts-<approved-proof-sha>-<authorization-sha256>.tar.gz
 
 Before any token is consumed, the adapter rejects a pre-existing
 `proof-artifacts/` directory or `candidate/` checkout. The spent-token
-authority is fixed at `~/.local/state/linguagraph-m7-proof`; an inherited
-`M7_PROOF_HOST_STATE` may only repeat that exact path.
+authority is derived from the operating-system account home, not an injected
+`HOME`; inherited `HOME` must match that account home, and an inherited
+`M7_PROOF_HOST_STATE` may only repeat the resulting exact path.
+
+Canonical archive and SHA-256 sidecar paths are reserved with no-clobber
+semantics. A replay or any pre-existing archive slot therefore fails closed
+without overwriting the first retained artifact.
 
 ## Stage P2 bounded correction boundary
 
