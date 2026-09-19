@@ -68,7 +68,8 @@ write_manifest() {
 }
 
 build_archive() {
-  local archive_name=$1 archive=$2 sidecar="${archive}.sha256"
+  local archive_name=$1 archive=$2 sidecar=''
+  sidecar="${archive}.sha256"
 
   # Reserve both canonical output paths without clobbering. This makes a
   # repeated authorization attempt incapable of overwriting the first archive.
