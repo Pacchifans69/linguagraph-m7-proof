@@ -1,20 +1,22 @@
 #!/usr/bin/env bash
 # LinguaGraph M7 provider-neutral semantic proof core.
 #
-# Stage P2 corrected harness only. This file MUST NOT be executed without a separate
-# Human approval of the exact proof commit and a fresh M7-EXI-01 one-shot run
-# authorization supplied through the Alibaba ECS adapter.
+# Successor proof-source rebind preparation only. The Product pins below target
+# the docs-only M7-SHDR-F01 successor. This file MUST NOT be executed without a
+# separate Human approval of the exact proof commit, an exact live provider
+# binding, and a fresh M7 one-shot run authorization through an approved adapter.
 set -Eeuo pipefail
 
 readonly PROOF_ROOT="$(git rev-parse --show-toplevel)"
 readonly EVIDENCE="${M7_PROOF_EVIDENCE_DIR:-$PROOF_ROOT/proof-artifacts}"
 readonly CANDIDATE="$PROOF_ROOT/candidate"
 
-# Exact Product binding approved for M7 Gate 2.
+# Exact Product binding for the M7-SHDR-F01 docs-only successor. The predecessor
+# 854137cd... has historical exact-epoch proof; that proof does not transfer.
 readonly APP_BRANCH='m7-alignment-mutation-concurrency-hardening'
-readonly APP_SHA='854137cd498569f7c3d770d3b82be51042080edd'
-readonly APP_TREE='7b5306fbd37a158cd1fb688fd050d20cfc5aec74'
-readonly APP_PARENT='945d9d4bbe081eedd11088315b5007d80d8910d4'
+readonly APP_SHA='c7aae26e3abaa34b3756ffe96ee718beaf8524b3'
+readonly APP_TREE='1afa65b74a41ef43699425bbcc3ccbb30cb64658'
+readonly APP_PARENT='854137cd498569f7c3d770d3b82be51042080edd'
 readonly MAIN_SHA='3f08eca99f03180eef9dcd7008287892f0e6501d'
 readonly ALEMBIC_HEAD='0006'
 readonly APP_URL='https://github.com/Pacchifans69/LinguaGraph.git'

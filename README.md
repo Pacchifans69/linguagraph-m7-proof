@@ -1,4 +1,4 @@
-# LinguaGraph M7 external proof preparation
+# LinguaGraph M7 external proof / successor rebind preparation
 
 This independent repository contains proof infrastructure only for
 **M7 — Alignment Mutation Concurrency Hardening**. It does not modify the
@@ -8,37 +8,42 @@ historical `Pacchifans69/linguagraph-m6-proof` evidence repository.
 ## Status
 
 ```text
-checkpoint:        M7
-exception:         M7-EXI-01 — Alibaba ECS Hosted Gate 2 Proof
-stage:             P2 — bounded harness correction; final static re-audit pending
-proof execution:   NOT AUTHORIZED / NOT EXECUTED
-run authorization: NOT ISSUED
-Gate 2 result:     NOT ESTABLISHED
+checkpoint:             M7
+proof path:             M7-EXI-01 — alternate hosted Gate 2 proof framework
+stage:                  successor Product rebind preparation
+successor proof:        NOT AUTHORIZED / NOT EXECUTED
+successor run auth:     NOT ISSUED
+successor Gate 2:       NOT ESTABLISHED
+provider binding:       PENDING / old exact ECS was released
+prior 854137cd epoch:   Gate 2 PASS / ESTABLISHED (historical exact-epoch evidence)
 ```
 
-This repository was prepared only after the exact-candidate canonical GitHub
-Actions attempt failed before all repository-defined steps:
+The current Product target is the docs-only `M7-SHDR-F01` successor. Its own
+canonical GitHub Actions attempt again failed before every repository-defined
+step:
 
 ```text
-Product run:       #124 / 35422565869
-Product head:      854137cd498569f7c3d770d3b82be51042080edd
+Product run:       #125 / 35436499631
+Product head:      c7aae26e3abaa34b3756ffe96ee718beaf8524b3
 job steps:         []
-log retrieval:     BlobNotFound
+runner id:         0
 classification:    provider / pre-step failure
 semantic evidence: none
 ```
 
-M7-EXI-01 is an **execution-environment exception only**. It waives no M7
-semantic requirement.
+This diagnostic is not application/test evidence. Any alternate hosted proof
+for the successor still requires a fresh Human-reviewed proof source, a fresh
+one-shot authorization, and an exact provider binding. No successor execution
+is authorized by this preparation.
 
 ## Exact Product binding
 
 ```text
 repository:     Pacchifans69/LinguaGraph
 branch:         m7-alignment-mutation-concurrency-hardening
-candidate SHA:  854137cd498569f7c3d770d3b82be51042080edd
-candidate tree: 7b5306fbd37a158cd1fb688fd050d20cfc5aec74
-unique parent:  945d9d4bbe081eedd11088315b5007d80d8910d4
+candidate SHA:  c7aae26e3abaa34b3756ffe96ee718beaf8524b3
+candidate tree: 1afa65b74a41ef43699425bbcc3ccbb30cb64658
+unique parent:  854137cd498569f7c3d770d3b82be51042080edd
 frozen main:    3f08eca99f03180eef9dcd7008287892f0e6501d
 Alembic head:   0006
 ```
@@ -46,6 +51,41 @@ Alembic head:   0006
 The provider-neutral core fails closed unless the remote Product branch, remote
 main, detached candidate checkout, tree, unique parent, and frozen-main
 ancestry all match these exact values.
+
+The successor changes only these four Product files relative to the already
+reviewed/proved implementation epoch `854137cd...`:
+
+```text
+AGENTS.md
+README.md
+docs/development/CURRENT_STATE.md
+docs/testing/testing-strategy.md
+```
+
+Application code, tests, dependencies, lockfiles, workflows, migration files,
+and runtime baselines are unchanged. Therefore the preparation-time expected
+suite counts remain `602 / 519 / 32`; they are guards only and must still be
+observed by any authorized formal run.
+
+## Prior exact-epoch evidence retained
+
+The immediate predecessor `854137cd498569f7c3d770d3b82be51042080edd`
+(tree `7b5306fbd37a158cd1fb688fd050d20cfc5aec74`) has historical exact-candidate
+Gate 2 evidence:
+
+```text
+proof source:       4274eeae6211a1744ac63958a026ff95670f445b
+proof tree:         2270f665b2659f88dcdd88bed216828e32e5a7ff
+formal outcome:     PASS
+pytest:             602 passed
+Vitest:             519 passed
+Playwright:         32 passed
+archive SHA-256:    2529a1e06989058c2a7acdac69374912ba2ccee32ba59c5438d2c746c8eed2a3
+authorization:      SPENT / MUST NOT REUSE
+```
+
+That evidence remains valid for `854137cd...` only. It does **not** transfer to
+`c7aae26e...`, even though the successor is docs-only.
 
 ## Technical basis
 
@@ -161,8 +201,8 @@ test skipped or filtered.
 
 ## Provider boundary
 
-The Alibaba adapter contains the previously measured ECS identity values as
-execution guards:
+The Alibaba adapter still contains the exact identity of the host used by the
+prior `854137cd...` proof:
 
 ```text
 instance id:   i-j6c13vpnkuq6xbbhyxzw
@@ -172,10 +212,18 @@ instance type: ecs.g9i.xlarge
 image:         ubuntu_24_04_x64_20G_alibase_20260828.vhd
 ```
 
-Their presence in source does **not** assert that the instance is currently
-running, reachable, or unchanged. Stage P3 must separately authorize provider
-restart/access and freshly verify provider identity before any formal proof
-authorization is issued.
+That exact ECS and its exact system disk were released after the predecessor
+proof artifacts were retrieved and independently verified off-host. The
+adapter's old provider constants are therefore **historical fail-closed guards,
+not a reusable provider binding**.
+
+This successor Product rebind deliberately does not invent a replacement
+provider identity and does not weaken the adapter to accept arbitrary hosts.
+Before any successor execution can be considered, a separate Human-authorized
+provider stage must establish a new exact instance/region/zone/type/image tuple
+and a later bounded provider-rebind correction must replace the historical
+constants. Until then the Alibaba adapter is **NOT EXECUTABLE FOR THE
+SUCCESSOR**.
 
 ## One-shot authorization
 
@@ -206,7 +254,7 @@ Canonical archive and SHA-256 sidecar paths are reserved with no-clobber
 semantics. A replay or any pre-existing archive slot therefore fails closed
 without overwriting the first retained artifact.
 
-## Stage P2 bounded correction boundary
+## Successor rebind preparation boundary
 
 This preparation commit authorizes and performs **none** of the following:
 
@@ -222,10 +270,11 @@ NO PR
 NO merge
 ```
 
-The P2 bounded correction closes the static-audit findings concerning stale
-evidence reuse, archive collisions, redirectable spent-token state, and the
-Python ElementTree JUnit check. It does not authorize execution.
+This rebind changes only the Product identity carried by the provider-neutral
+core plus proof-source documentation/comments. It does not change semantic
+proof stages, suite-count guards, one-shot/replay protection, artifact
+packaging, runtime pins, or provider identity checks.
 
-The next step is an independent **P2 final exact proof-source static
-re-audit**. Only after that audit passes may provider preflight be separately
-considered.
+The next step after landing, if separately authorized, is an independent exact
+proof-source static re-audit. Provider provisioning/rebinding and formal hosted
+execution remain separate Human authorization boundaries.

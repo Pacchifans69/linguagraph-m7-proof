@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 # M7-EXI-01 Alibaba ECS thin adapter.
 #
-# Stage P2 bounded harness correction only. Hosted execution is NOT authorized by this commit.
-# A formal run requires later Human approval of the exact proof SHA plus a
-# fresh one-shot M7-EXI-01 run authorization.
+# Successor Product rebind preparation only. Hosted execution is NOT authorized.
+# The provider identity constants below belong to the prior proof host, which
+# has been released. A formal successor run requires a separately authorized
+# exact provider rebind, exact proof SHA approval, and fresh one-shot authorization.
 set -Eeuo pipefail
 
 readonly PROOF_ROOT="$(git rev-parse --show-toplevel)"
@@ -34,9 +35,12 @@ readonly IMDS_BASE='http://100.100.100.200/latest'
 readonly IMDS_TOKEN_URL="$IMDS_BASE/api/token"
 readonly IMDS_TTL='21600'
 
-# M7 is intended to reuse the previously measured ECS host only after a
-# separate Stage P3 provider authorization and fresh identity verification.
-# These values are execution guards, not claims about current provider state.
+# Historical exact provider binding from the predecessor 854137cd... proof.
+# That instance and its system disk were released after off-host artifact
+# verification. These values are intentionally retained as fail-closed legacy
+# guards during successor Product rebind preparation; they MUST be replaced by
+# a separately Human-authorized exact provider rebind before successor execution.
+# Do not weaken this guard into a wildcard or runtime-supplied arbitrary host.
 readonly EXPECTED_INSTANCE_ID='i-j6c13vpnkuq6xbbhyxzw'
 readonly EXPECTED_REGION_ID='cn-hongkong'
 readonly EXPECTED_ZONE_ID='cn-hongkong-d'
